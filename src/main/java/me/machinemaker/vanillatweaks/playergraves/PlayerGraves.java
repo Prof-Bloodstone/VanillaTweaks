@@ -47,7 +47,7 @@ public class PlayerGraves extends BaseModule implements Listener {
         super(plugin, config -> config.playerGraves);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (event.getKeepInventory()) return;
         if (event.getDrops().isEmpty()) return;
@@ -65,7 +65,9 @@ public class PlayerGraves extends BaseModule implements Listener {
         inventoryContents = nullUnionList(inventoryContents, cachedDrops);
         List<ItemStack> extraContents = Arrays.asList(inventory.getExtraContents());
         extraContents = nullUnionList(extraContents, cachedDrops);
-        drops.clear(); // We could assert that cachedDrops is empty
+        drops.clear();
+        // If plugins add some drops - they should drop on the ground
+        cachedDrops.forEach((wrapper, count) -> drops.addAll(Collections.nCopies(count.intValue(), wrapper.item)));
 
         event.getEntity().sendMessage(Lang.GRAVE_AT.p().replace("%x%", String.valueOf(location.getBlockX())).replace("%y%", String.valueOf(location.getBlockY())).replace("%z%", String.valueOf(location.getBlockZ())));
         Long timestamp = System.currentTimeMillis();
