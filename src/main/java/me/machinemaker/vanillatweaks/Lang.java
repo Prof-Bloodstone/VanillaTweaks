@@ -7,7 +7,7 @@ public enum Lang {
     PREFIX("&8[&9V&1T&8] &r"),
     ERROR_PREFIX("&8[&4V&cT&8] &r"),
 
-    RELOAD("&aConfiguration/Modules/Lang reloaded."),
+    RELOAD("&aConfiguration/Modules/Lang reloaded. &cIf you are overriding commands from this plugin with commands from another plugin, you should do a full reload of the server."),
     NOT_ENABLED("&cThis module is not enabled!"),
 
     SCOREBOARD_ON("&aTurned on %board% scoreboard."),
@@ -63,7 +63,7 @@ public enum Lang {
     PILLAGER_TOGGLE("pillagertools.", "&6%setting% &ehas been set to &6%val%&e."),
 
     // Workstation Highlights
-    NO_VILLAGER("workstationhightlights.", "&eNo villager found withing 3 blocks."),
+    NO_VILLAGER("workstationhightlights.", "&eNo villager found within 3 blocks."),
     NO_JOB_SITE("workstationhighlights.", "&eThis villager does not have a job site."),
     HIGHLIGHTED_SITE("workstationhighlights.", "&aHighlighted the workstation!"),
 
@@ -71,6 +71,12 @@ public enum Lang {
     PLAYER_IS_IT("tag.", "&e%name% &ehas been tagged!"),
     PLAYER_IS_AFK("tag.", "&e%name% &eis AFK!"),
     PLAYER_IS_ALREADY_IT("tag.", "&e%name% &eis already it!"),
+    COOLDOWN_ACTIVE("tag.", "&eYou cannot tag anyone yet! &6%time% &eseconds left..."),
+
+    // Nether Portal Coords
+    PLAYER_IN_OVERWORLD("portalcoords.", "&eNether: X:%x% | Y:%y% | Z:%z%"),
+    PLAYER_IN_NETHER("portalcoords.", "&3eOverworld: X:%x% | Y:%y% | Z:%z%"),
+    INVALID_WORLD("portalcoords.", "&eThis world is not configured as an overworld or nether.")
     ;
 
     String path;
@@ -110,17 +116,23 @@ public enum Lang {
 
     public static void init(YamlConfig config) {
         Lang.config = config;
+        loadValues();
+        config.save();
+    }
+
+    public static void reload() {
+        config.reload();
+        loadValues();
+        config.save();
+    }
+
+    private static void loadValues() {
         for (Lang m : Lang.values()) {
             if (!config.isSet(m.getPath()))
                 config.set(m.getPath(), m.getMsg());
             else if (!config.get().getString(m.getPath()).equals(m.getMsg()))
                 m.setMsg(config.get().getString(m.getPath()));
         }
-        config.save();
-    }
-
-    public static void reload() {
-        Lang.config.reload();
     }
 
     @Override

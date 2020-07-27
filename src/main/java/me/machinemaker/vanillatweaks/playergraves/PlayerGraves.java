@@ -51,6 +51,15 @@ public class PlayerGraves extends BaseModule implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         if (event.getKeepInventory()) return;
         if (event.getDrops().isEmpty()) return;
+        if (!event.getEntity().hasPermission("vanillatweaks.playergraves")) return;
+        boolean empty = true;
+        for (ItemStack stack : event.getEntity().getInventory().getContents()) {
+            if (stack != null) {
+                empty = false;
+                break;
+            }
+        }
+        if (empty) return;
         Block spawnBlock = event.getEntity().getLocation().getBlock();
         while (spawnBlock.getType() == Material.AIR) {
             spawnBlock = spawnBlock.getRelative(BlockFace.DOWN);
