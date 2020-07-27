@@ -59,11 +59,11 @@ public class PlayerGraves extends BaseModule implements Listener {
         if (event.getKeepInventory()) return;
         if (event.getDrops().isEmpty()) return;
         if (!event.getEntity().hasPermission("vanillatweaks.playergraves")) return;
-        if (event.getDrops().isEmpty()) return;
         if (config.disabledWorlds.contains(event.getEntity().getWorld().getName())) return;
         
         Block spawnBlock = event.getEntity().getLocation().getBlock();
         while (spawnBlock.getType() == Material.AIR) {
+            // TODO: What if you get killed in the void?
             spawnBlock = spawnBlock.getRelative(BlockFace.DOWN);
         }
         Location location = spawnBlock.getRelative(BlockFace.UP).getLocation().add(0.5, 0, 0.5);
@@ -71,14 +71,16 @@ public class PlayerGraves extends BaseModule implements Listener {
         List<ItemStack> drops = event.getDrops();
         @NotNull Map<CachedHashObjectWrapper<ItemStack>, MutableInt> cachedDrops = toCachedMapCount(drops);
         List<ItemStack> armorContents = Arrays.asList(inventory.getArmorContents());
-        List<ItemStack> inventoryContents = Arrays.asList(inventory.getStorageContents());
         armorContents = nullUnionList(armorContents, cachedDrops);
+        List<ItemStack> inventoryContents = Arrays.asList(inventory.getStorageContents());
         inventoryContents = nullUnionList(inventoryContents, cachedDrops);
         List<ItemStack> extraContents = Arrays.asList(inventory.getExtraContents());
         extraContents = nullUnionList(extraContents, cachedDrops);
         drops.clear();
         // If plugins add some drops - they should drop on the ground
-        cachedDrops.forEach((wrapper, count) -> drops.addAll(Collections.nCopies(count.intValue(), wrapper.item)));
+        cachedDrops.forEach((wrapper, count) ->
+                drops.addAll(Collections.nCopies(count.intValue(), wrapper.item))
+        );
 
         event.getEntity().sendMessage(Lang.GRAVE_AT.p().replace("%x%", String.valueOf(location.getBlockX())).replace("%y%", String.valueOf(location.getBlockY())).replace("%z%", String.valueOf(location.getBlockZ())));
         Long timestamp = System.currentTimeMillis();

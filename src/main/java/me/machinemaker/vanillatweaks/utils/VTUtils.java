@@ -56,9 +56,9 @@ public class VTUtils {
         for (T item: unioned) {
             MutableInt x = with.get(new CachedHashObjectWrapper<>(item));
             if (x == null || x.intValue() <= 0) {
-                result.add(item);
-            } else {
                 result.add(null);
+            } else {
+                result.add(item);
                 x.decrement();
             }
         }
